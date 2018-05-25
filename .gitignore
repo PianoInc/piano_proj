@@ -6,5 +6,4 @@ debug.log
 dump.json
 test.py
 /slack_bot
-/static
 /crawler/data
