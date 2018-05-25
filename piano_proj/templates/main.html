@@ -1,0 +1,41 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>메인화면</title>
+
+    <link rel="stylesheet" href="{% static 'piano_proj/css/style.css' %}">
+</head>
+<body>
+<div class="container">
+    <table>
+        <tr>
+            <td>
+                <a href="/money_crawler/show_vis_list/">
+                    <img src="{% static 'piano_proj/img/business.png' %}" title="정부 지원 사업">
+                </a>
+            </td>
+            <td>
+                <a href="/appstore_crawler/show_list/">
+                    <img src="{% static 'piano_proj/img/appstore.png' %}" title="앱스토어 조사">
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="/outsourcing_crawler/show_vis_list/">
+                    <img src="{% static 'piano_proj/img/outsourcing.png' %}" title="외주 크롤러">
+                </a>
+            </td>
+            <td>
+                <a href="/piano_note/">
+                    <img src="{% static 'piano_proj/img/piano.png' %}" title="노트앱 받기">
+                </a>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

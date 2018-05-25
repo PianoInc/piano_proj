@@ -1,0 +1,19 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>외주</title>
+
+    <link rel="stylesheet" href="{% static 'outsourcing_crawler/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <center>
+            {% block content %}
+            {% endblock content %}
+        </center>
+    </div>
+</body>
+</html>

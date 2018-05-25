@@ -1,0 +1,96 @@
+{% extends "outsourcing_crawler/base.html" %}
+
+{% block content %}
+<style>
+      .business_tb td {
+        width: 260px;
+      }
+      #period, #price {
+        width: 215px;
+      }
+      #title {
+        width: 480px;
+      }
+      #context {
+        width: 100%;
+        height: 480px;
+      }
+      .context {
+
+      }
+    </style>
+
+<script type="text/javascript">
+    function sendData(mode, idx){
+        var send_form = document.frm_send_data;
+        if(mode == "write"){
+            send_form.action = "/outsourcing_crawler/add_job/";
+        } else if(mode == "modify"){
+            send_form.action = "/outsourcing_crawler/modify_job/"+idx+"/";
+        }
+        send_form.submit();
+    }
+
+    function postnTbody(opt){
+      if(opt=='new'){
+        $('#fav_body').hide();
+        $('#res_body').show();
+        $('#send_selnomal_bt').hide();
+        $('#send_selfav_bt').show();
+      }
+      if(opt=='fav'){
+        $('#fav_body').show();
+        $('#res_body').hide();
+        $('#send_selnomal_bt').show();
+        $('#send_selfav_bt').hide();
+      }
+    }
+</script>
+<table class="menu">
+    <tr>
+        <td>
+            <a href="javascript:location.href= '{% url 'main' %}';">첫 화면으로</a>
+        </td>
+        <td>
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:show_invis_list' %}';">삭제 된 목록</a>
+        </td>
+        <td>
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:invis_past_biz' %}';">지난 외주 일괄 삭제</a>
+        </td>
+        <td>
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:show_fav_list' %}' ;">즐겨찾기</a>
+            /
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:show_vis_list' %}';">새 외주</a>
+        </td>
+    </tr>
+</table>
+<form method="POST" name="frm_send_data" target="">
+    {% csrf_token %}
+    <table border="1">
+        <tr>
+            <td colspan='2'>
+                제목 :
+                <input type="text" name="title" value="{{result.title}}">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                기한 :
+                <input type="text" name="period" value="{{result.period}}">
+            </td>
+            <td>
+                금액 :
+                <input type="text" name="price" value="{{result.price}}">
+            </td>
+        </tr>
+        <tr>
+            <td colspan='2' class='contents'>
+                내용 :<br>
+                <textarea name="contents" cols=50 rows=50 >{{result.contents}}</textarea>
+            </td>
+        </tr>
+    </table>
+    <input type="button" value='수정' onclick="javascript:sendData('modify',{{result.idx}})">
+    <button ><a href="javascript:location.href= '{% url 'outsourcing_crawler:show_vis_list'%}';">취소</a></button>
+</form>
+{% endblock content %}

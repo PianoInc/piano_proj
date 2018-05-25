@@ -1,0 +1,20 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>정부지원사업</title>
+
+    <link rel="stylesheet" href="{% static 'money_crawler/css/style.css' %}">
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <center>
+        {% block content %}
+        {% endblock content %}
+        </center>
+    </div>
+</body>
+</html>

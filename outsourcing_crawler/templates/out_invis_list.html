@@ -1,0 +1,119 @@
+{% extends "outsourcing_crawler/base.html" %}
+
+{% block content %}
+<script type="text/javascript">
+    var check = false;
+
+    function CheckAll(){
+        var chk = document.getElementsByName("checks[]");
+        if(check == false){
+            check = true;
+            for(var i=0; i<chk.length;i++){
+                chk[i].checked = true;     //모두 체크
+             }
+        }else{
+            check = false;
+            for(var i=0; i<chk.length;i++){
+                chk[i].checked = false;     //모두 해제
+             }
+        }
+    }
+    function sendData(mode, idx){
+        var send_form = document.frm_send_data;
+        var name = "\"" + idx + "\""
+
+        if(mode == "fav"){
+            send_form.action = "/outsourcing_crawler/make_fav/"+idx+"/";
+        } else if(mode == "sel_fav"){
+            send_form.action = "{% url 'outsourcing_crawler:make_sel_fav' %}";
+        }
+        send_form.submit();
+    }
+</script>
+<table class="menu">
+    <tr>
+        <td>
+            <a href="javascript:location.href= '{% url 'main' %}';">첫 화면으로</a>
+        </td>
+        <td>
+            <a href="{% url 'outsourcing_crawler:show_vis_list' %}">목록으로 돌아가기</a>
+        </td>
+        <td>
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:invis_past_biz' %}';">지난 외주목록 일괄 삭제</a>
+        </td>
+    </tr>
+</table>
+
+<div class="send_select_div" >
+    <input type="button" onclick="javascript:sendData('sel_fav',0);" id="send_selfav_bt" value="복구 후 즐겨찾기">
+</div>
+
+<form method="POST" name="frm_send_data">
+    {% csrf_token %}
+    <table class="business_tb">
+        <tr>
+            <th>
+                <p>전체 선택</p>
+                <input type="checkbox" name="checks[]" onclick="javascript:CheckAll();">
+            </th>
+            <th>
+                마감날짜
+            </th>
+            <th>
+                삭제된 갯수 : {{res_cnt}} 개
+            </th>
+            <th>
+                사업명
+            </th>
+            <th>
+                출처
+            </th>
+        </tr>
+        {% if res_custom %}
+        <tbody id="custom_body" class='show'>
+        {% for item in res_custom %}
+        <tr>
+            <td>
+                <input type="checkbox" name="checks[]" value="{{item.idx}}" >
+            </td>
+            <td class="{{item.due_flag}}" >{{ item.due }}</td>
+            <td>
+                <input type="button" onclick="javascript:sendData('fav',{{item.idx}})" value="즐겨찾기" style="width: 70pt;">
+            </td>
+            <td>
+                <input type="button" onclick="javascript:sendData('invis',{{item.idx}})" value="삭제">
+            </td>
+            <td>
+                <a href="{{ item.url }}">{{item.title}}</a>
+            </td>
+            <td>
+                {{item.period}}
+            </td>
+            <td>
+                {{item.price}}
+            </td>
+            <td>{{ item.site }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        {% endif %}
+        {% if result %}
+        {% for item in result %}
+        <tr>
+            <td>
+                <input type="checkbox" name="checks[]" value="{{item.idx}}" >
+            </td>
+            <td>{{ item.due }}</td>
+            <td>
+                <input type="button" onclick="javascript:sendData('fav',{{item.idx}})" value="복구 후 즐겨찾기">
+            </td>
+            <td>
+                <a href="{{ item.url }}">{{ item.title }}</a>
+            </td>
+            <td>{{ item.site }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</form>
+{% endblock content %}

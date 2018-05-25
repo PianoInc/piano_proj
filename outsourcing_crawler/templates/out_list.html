@@ -1,0 +1,167 @@
+{% extends "outsourcing_crawler/base.html" %}
+
+{% block content %}
+<script type="text/javascript">
+    var check = false;
+
+    function CheckAll(){
+        var chk = document.getElementsByName("checks[]");
+        if(check == false){
+            check = true;
+            for(var i=0; i<chk.length;i++){
+                chk[i].checked = true;     //모두 체크
+             }
+        }else{
+            check = false;
+            for(var i=0; i<chk.length;i++){
+                chk[i].checked = false;     //모두 해제
+             }
+        }
+    }
+
+    function sendData(mode, idx){
+        var send_form = document.frm_send_data;
+        if(mode == "fav"){
+            send_form.action = "/outsourcing_crawler/make_fav/"+idx+"/";
+        } else if(mode == "invis"){
+            send_form.action = "/outsourcing_crawler/make_invis/"+idx+"/";
+        } else if(mode == "nomal"){
+            send_form.action = "/outsourcing_crawler/make_nomal/"+idx+"/";
+        } else if(mode == "sel_nomal"){
+            send_form.action = "{% url 'outsourcing_crawler:make_sel_nomal' %}";
+        } else if(mode == "sel_fav"){
+            send_form.action = "{% url 'outsourcing_crawler:make_sel_fav' %}";
+        } else if(mode == "sel_invis"){
+            send_form.action = "{% url 'outsourcing_crawler:make_sel_invis' %}";
+        } else if(mode == 'write_job'){
+            send_form.action = "{% url 'outsourcing_crawler:write_job' %}";
+        }
+        send_form.submit();
+    }
+
+    function postnTbody(opt){
+      if(opt=='new'){
+        $('#fav_body').hide();
+        $('#res_body').show();
+        $('#send_selnomal_bt').hide();
+        $('#send_selfav_bt').show();
+      }
+      if(opt=='fav'){
+        $('#fav_body').show();
+        $('#res_body').hide();
+        $('#send_selnomal_bt').show();
+        $('#send_selfav_bt').hide();
+      }
+    }
+</script>
+<table class="menu">
+    <tr>
+        <td>
+            <a href="javascript:location.href= '{% url 'main' %}';">첫 화면으로</a>
+        </td>
+        <td>
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:show_invis_list' %}';">삭제 된 목록</a>
+        </td>
+        <td>
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:invis_past_biz' %}';">지난 외주 일괄 삭제</a>
+        </td>
+        <td>
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:show_fav_list' %}' ;">즐겨찾기</a>
+            /
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:show_vis_list' %}';">새 외주 구인</a>
+        </td>
+        <td>
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:write_job' %}';">외주 추가</a>
+        </td>
+    </tr>
+</table>
+<div class="send_select_div" >
+    <input type="button" onclick="javascript:sendData('sel_fav',0);" id="send_selfav_bt" value="즐겨찾기">
+    <input type="button" onclick="javascript:sendData('sel_invis',0);" id="send_selinvis_bt" value="삭제">
+</div>
+<form method="POST" name="frm_send_data" target="">
+    {% csrf_token %}
+    <table class="business_tb">
+        <tr>
+            <th>
+                <p>전체 선택</p>
+                <input type="checkbox" name="checks[]" onclick="javascript:CheckAll();">
+            </th>
+            <th>
+                <a href="{% url 'outsourcing_crawler:show_sort_list' sort='dn' %}">공고 마감날짜</a>
+            </th>
+            <th colspan="2">
+                새 외주 : {{res_cnt}} 개
+            </th>
+            <th>
+                외주명
+            </th>
+            <th>
+                개발기간
+            </th>
+            <th>
+                금액
+            </th>
+            <th>
+              출처
+            </th>
+        </tr>
+        {% if res_custom %}
+        <tbody id="custom_body" class='show'>
+        {% for item in res_custom %}
+        <tr>
+            <td>
+                <input type="checkbox" name="checks[]" value="{{item.idx}}" >
+            </td>
+            <td class="{{item.due_flag}}" >{{ item.due }}</td>
+            <td>
+                <input type="button" onclick="javascript:sendData('fav',{{item.idx}})" value="즐겨찾기" style="width: 70pt;">
+            </td>
+            <td>
+                <input type="button" onclick="javascript:sendData('invis',{{item.idx}})" value="삭제">
+            </td>
+            <td>
+                <a href="{{ item.url }}">{{item.title}}</a>
+            </td>
+            <td>
+                {{item.period}}
+            </td>
+            <td>
+                {{item.price}}
+            </td>
+            <td>{{ item.site }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        {% endif %}
+        {% if result %}
+        <tbody id="res_body" class='show'>
+        {% for item in result %}
+        <tr>
+            <td>
+                <input type="checkbox" name="checks[]" value="{{item.idx}}" >
+            </td>
+            <td class="{{item.due_flag}}" >{{ item.due }}</td>
+            <td>
+                <input type="button" onclick="javascript:sendData('fav',{{item.idx}})" value="즐겨찾기" style="width: 70pt;">
+            </td>
+            <td>
+                <input type="button" onclick="javascript:sendData('invis',{{item.idx}})" value="삭제">
+            </td>
+            <td>
+                <a href="{{ item.url }}">{{item.title}}</a>
+            </td>
+            <td>
+                {{item.period}}
+            </td>
+            <td>
+                {{item.price}}
+            </td>
+            <td>{{ item.site }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    {% endif %}
+    </table>
+</form>
+{% endblock content %}

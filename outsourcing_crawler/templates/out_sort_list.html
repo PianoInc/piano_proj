@@ -1,0 +1,129 @@
+{% extends "outsourcing_crawler/base.html" %}
+
+{% block content %}
+<script type="text/javascript">
+    var check = false;
+    function CheckAll(){
+        var chk = document.getElementsByName("checks[]");
+        if(check == false){
+            check = true;
+            for(var i=0; i<chk.length;i++){
+                chk[i].checked = true;     //모두 체크
+             }
+        }else{
+            check = false;
+            for(var i=0; i<chk.length;i++){
+                chk[i].checked = false;     //모두 해제
+             }
+        }
+    }
+
+    function sendData(mode, idx){
+        var send_form = document.frm_send_data;
+
+        if(mode == "fav"){
+            send_form.action = "/outsourcing_crawler/make_fav/"+idx+"/";
+        } else if(mode == "invis"){
+            send_form.action = "/outsourcing_crawler/make_invis/"+idx+"/";
+        } else if(mode == "nomal"){
+            send_form.action = "/outsourcing_crawler/make_nomal/"+idx+"/";
+        }
+        send_form.submit();
+    }
+
+    function sort(sort){
+        if(sort=='up'){
+            location.href = "{% url 'outsourcing_crawler:show_sort_list' sort='up' %}";
+        }else{
+            location.href = "{% url 'outsourcing_crawler:show_sort_list' sort='dn' %}";
+        }
+    }
+
+    function postnTbody(opt){
+      if(opt=='new'){
+        $('#fav_body').hide();
+        $('#res_body').show();
+      }
+      if(opt=='fav'){
+        $('#fav_body').show();
+        $('#res_body').hide();
+      }
+    }
+</script>
+<table class="menu">
+    <tr>
+        <td>
+            <a href="javascript:location.href= '{% url 'main' %}';">첫 화면으로</a>
+        </td>
+        <td>
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:show_invis_list' %}';">삭제 된 목록</a>
+        </td>
+        <td>
+            <a href="javascript:location.href= '{% url 'outsourcing_crawler:invis_past_biz' %}';">지난 사업목록 일괄 삭제</a>
+        </td>
+        <td>
+            <a href="javascript:postnTbody('fav');">즐겨찾기</a>
+            /
+            <a href="javascript:postnTbody('new');">새 지원 사업</a>
+        </td>
+    </tr>
+</table>
+<form method="POST" name="frm_send_data" target="">
+    {% csrf_token %}
+    <table class="business_tb">
+        <tr>
+            <th>
+                <a href="javascript:sort('{{sort}}')">마감날짜</a>
+            </th>
+            <th colspan="2">
+                즐겨찾기 : {{fav_cnt}} 개
+            </th>
+            <th>
+                사업명
+            </th>
+            <th>
+                출처
+            </th>
+        </tr>
+        {% if favs %}
+        <tbody id="fav_body" class='hide'>
+        {% for item in favs %}
+        <tr>
+            <td class="{{item.due_flag}}" >{{ item.due }}</td>
+            <td>
+                <input type="button" onclick="javascript:sendData('nomal',{{item.idx}})" value="즐겨찾기 취소" style="width: 70pt;">
+            </td>
+            <td>
+                <input type="button" onclick="javascript:sendData('invis',{{item.idx}})" value="삭제">
+            </td>
+            <td>
+                <a href="{{ item.url }}">{{item.title}}</a>
+            </td>
+            <td>{{ item.site }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        {% endif %}
+        {% if result %}
+        <tbody id="res_body" class='show'>
+        {% for item in result %}
+        <tr>
+            <td class="{{item.due_flag}}" >{{ item.due }}</td>
+            <td>
+                <input type="button" onclick="javascript:sendData('fav',{{item.idx}})" value="즐겨찾기" style="width: 70pt;">
+            </td>
+            <td>
+                <input type="button" onclick="javascript:sendData('invis',{{item.idx}})" value="삭제">
+            </td>
+            <td>
+                <a href="{{ item.url }}">{{item.title}}</a>
+            </td>
+            <td>{{ item.site }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        {% endif %}
+    </table>
+</form>
+{% endblock content %}
+

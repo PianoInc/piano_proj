@@ -1,0 +1,18 @@
+{% extends "appstore_crawler/base.html" %}
+
+{% block content %}
+<a href="{% url 'main' %}">첫 화면으로</a>
+<input type="button" onclick="javascript:location.href= '{% url 'appstore_crawler:show_list' %}';" value="리스트 보기">
+<input type="button" onclick="javascript:location.href='{% url 'appstore_crawler:show_icon' %}';" value="아이콘 모아보기">
+<input type="button" onclick="javascript:location.href='{% url 'appstore_crawler:show_img' %}';" value="스크린샷 모아 보기">
+<input type="button" onclick="javascript:location.href='{% url 'appstore_crawler:show_review' %}';" value="리뷰 모아 보기">
+<table class="tbl_appstore">
+    <tr>
+        <td>
+    {% for item in icons %}
+            <img src="{{item.icon_url}}" title="{{item.title}}" onclick="javascript:location.href='{% url 'appstore_crawler:show_detail' app_id=item.app_id %}';" width="100" height="100">
+    {% endfor %}
+        </td>
+    </tr>
+</table>
+{% endblock content %}

@@ -1,0 +1,17 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>메인화면</title>
+
+    <link rel="stylesheet" href="{% static 'piano_proj/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+            {% block content %}
+            {% endblock content %}
+    </div>
+</body>
+</html>

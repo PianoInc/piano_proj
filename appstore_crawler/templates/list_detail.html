@@ -1,0 +1,101 @@
+{% extends "appstore_crawler/base.html" %}
+
+{% block content %}
+<a href="{% url 'main' %}">첫 화면으로</a>
+<input type="button" onclick="javascript:location.href='{% url 'appstore_crawler:show_list' %}';" value="리스트 보기">
+<input type="button" onclick="javascript:location.href='{% url 'appstore_crawler:show_icon' %}';" value="아이콘 모아보기">
+<input type="button" onclick="javascript:location.href='{% url 'appstore_crawler:show_img' %}';" value="스크린샷 모아 보기">
+<input type="button" onclick="javascript:location.href='{% url 'appstore_crawler:show_review' %}';" value="리뷰 모아 보기">
+<table class="tbl_appstore">
+    {% for item in app %}
+    <tr>
+        <td colspan="4" >
+            {{item.title}}
+        </td>
+    </tr>
+    <tr>
+        <td rowspan="4" >
+            <img src="{{item.icon_url}}">
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            App ID : {{item.app_id}}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            Support Language : {{item.lang}}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            App Size : {{item.size}}
+        </td>
+    </tr>
+    {% endfor %}
+    {% for item in img %}
+    <tr>
+        <td colspan="8">
+        {% if item.img_url_0 %}
+            <img src="{{item.img_url_0}}">
+        {% endif %}
+        {% if item.img_url_1 != 'null' %}
+            <img src="{{item.img_url_1}}">
+        {% endif %}
+        {% if item.img_url_2 != 'null' %}
+            <img src="{{item.img_url_2}}">
+        {% endif %}
+        {% if item.img_url_3 != 'null' %}
+            <img src="{{item.img_url_3}}">
+        {% endif %}
+        {% if item.img_url_4 != 'null' %}
+            <img src="{{item.img_url_4}}">
+        {% endif %}
+        {% if item.img_url_5 != 'null' %}
+            <img src="{{item.img_url_5}}">
+        {% endif %}
+        {% if item.img_url_6 != 'null' %}
+            <img src="{{item.img_url_6}}">
+        {% endif %}
+        {% if item.img_url_7 != 'null' %}
+            <img src="{{item.img_url_7}}">
+        {% endif %}
+        {% if item.img_url_8 != 'null' %}
+            <img src="{{item.img_url_8}}">
+        {% endif %}
+        {% if item.img_url_9 != 'null' %}
+            <img src="{{item.img_url_9}}">
+        {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% for item in review %}
+<table class="tbl_appstore" border="1" width="50%">
+    <tr>
+        <td>
+            글쓴이 : {{item.author}}
+        </td>
+        <td width="30%">
+            App ID : <a href="{% url 'appstore_crawler:show_detail' app_id=item.app_id %}">{{item.app_id}}</a>
+        </td>
+        <td width="30%">
+            평점 : {{item.rating}}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            제목 : {{item.title}}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            내용 : {{item.review}}
+        </td>
+    </tr>
+</table>
+<br>
+<br>
+{% endfor %}
+{% endblock content %}
