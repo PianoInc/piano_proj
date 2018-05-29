@@ -235,19 +235,21 @@ def bizinfo():
         return
 
 
-def kstartup_send_data(titles, top_list_cnt, uls, flag):
+def kstartup_send_data(titles, uls, flag):
     BASE_URL = "http://k-startup.go.kr/common/announcement/announcementDetail.do?searchDtlAncmSn=0&searchPrefixCode=BOARD_701_001&searchBuclCd=&searchAncmId=&searchPostSn=%s&bid=701&mid=30004&searchBusinessSn=0"
     BASE_BI_URL = "http://bi.go.kr/board/editViewPop.do?boardID=RECRUIT&postSeq=%s"
-    for title_cnt in range(len(titles) - top_list_cnt):
-        name = titles[title_cnt].text.lstrip().rstrip()
-        lis = uls[title_cnt].find_all("li")
+    print("send data start")
+    for cnt in range(len(titles)):
+        print(titles[cnt].text)
+        name = titles[cnt].text.lstrip().rstrip()
+        lis = uls[cnt].find_all("li")
         if len(lis) > 2:
-            due_ori = lis[2].text.lstrip().rstrip()[6:16]
+            due_ori = date_p.search(lis[2].text).group()
         else:
             due_ori = "공고참조"
         due_flag = check_date(due_ori)
         # 글의 HREF값을 가져옴
-        href = titles[title_cnt].get('href')
+        href = titles[cnt].get('href')
         if href.find('itemSelect') >= 0:
             identifier = searchPostSn_p.search(href).group()
             url = BASE_URL % identifier
@@ -260,7 +262,7 @@ def kstartup_send_data(titles, top_list_cnt, uls, flag):
                 break
             except :
                 print("Write error")
-def kstratup():
+def kstartup():
     # 페이지에 접속하기 위해 URL을 만들어준다.
     INPUT_URL = "https://www.k-startup.go.kr/common/announcement/announcementList.do?mid=30004&bid=701"
 
@@ -279,56 +281,53 @@ def kstratup():
             last_identifier = data[data_index - n]['identify']  # identifier
             print(last_identifier)
             break
-        end_flag = 0
-        while 1:
-            if end_flag:
-                break
                 # 홈페이지에 접속한다.
-            req = requests.get(INPUT_URL)
-            # 페이지의 element 모두가져오기
-            html_parse = req.text
-            soup = BeautifulSoup(html_parse, 'html.parser')
-            # 사업명이 들어있는 필드에 접근해서 모든 사업명을 total_title이라는 변수에 넣는답
-            listwrap = soup.find_all(class_="listwrap")
-            # 공지 갯수
-            top_list_cnt = len(listwrap[0].find_all(class_="list_info"))
-            titles = soup.select("#content_w1100 > div.listwrap > ul > li > h4 > a")[top_list_cnt:]
-
-            for title_cnt in range(len(titles)):
-                href = titles[title_cnt].get('href')
-                if href.find('itemSelect') >= 0:
-                    identifier = searchPostSn_p.search(href).group()
-                if href.find('biNetSelect') >= 0:
-                    identifier = bi_postSeq_p.search(href).group()
-                if (identifier == last_identifier):
-                    end_flag = 1
-                    break
-                new_post += 1
-
-        if new_post:
-            titles = titles[:new_post]
-            titles.reverse()
-            uls = soup.select("#content_w1100 > div.listwrap > ul > li > ul")[:new_post]
-            uls.reverse()
-            kstartup_send_data(titles, top_list_cnt, uls, ADDITIONAL_CRAWLING)
-
-    else :
-        print("no data")
-        # 홈페이지에 접속한다.
         req = requests.get(INPUT_URL)
         # 페이지의 element 모두가져오기
         html_parse = req.text
         soup = BeautifulSoup(html_parse, 'html.parser')
         # 사업명이 들어있는 필드에 접근해서 모든 사업명을 total_title이라는 변수에 넣는답
-        titles = soup.select("#content_w1100 > div.listwrap > ul > li > h4 > a")
-        titles.reverse()
+        listwrap = soup.find_all(class_="listwrap")
+        # 공지 갯수
+        top_list_cnt = len(listwrap[0].find_all(class_="list_info"))
+        titles = soup.select("#content_w1100 > div.listwrap > ul > li > h4 > a")[top_list_cnt:]
+
+        for cnt in range(len(titles)):
+            href = titles[cnt].get('href')
+            if href.find('itemSelect') != -1:
+                identifier = searchPostSn_p.search(href).group()
+            if href.find('biNetSelect') != -1:
+                identifier = bi_postSeq_p.search(href).group()
+            if (identifier == last_identifier):
+                break
+            new_post += 1
+
+        if new_post:
+            titles = titles[:new_post]
+            titles.reverse()
+            uls = soup.select("#content_w1100 > div.listwrap > ul > li > ul")[top_list_cnt:top_list_cnt+new_post]
+            uls.reverse()
+            kstartup_send_data(titles, uls, ADDITIONAL_CRAWLING)
+
+    else :
+        print("no data")
+        # 홈페이지에 접속한다.
+        req = requests.get(INPUT_URL)
+        print("접속완료")
+        # 페이지의 element 모두가져오기
+        html_parse = req.text
+        soup = BeautifulSoup(html_parse, 'html.parser')
+        # 사업명이 들어있는 필드에 접근해서 모든 사업명을 total_title이라는 변수에 넣는답
         listwrap = soup.find_all(class_="listwrap")
 
         # 공지 갯수
         top_list_cnt = len(listwrap[0].find_all(class_="list_info"))
-        uls = soup.select("#content_w1100 > div.listwrap > ul > li > ul")
+        uls = soup.select("#content_w1100 > div.listwrap > ul > li > ul")[top_list_cnt:]
+        titles = soup.select("#content_w1100 > div.listwrap > ul > li > h4 > a")[top_list_cnt:]
+        titles.reverse()
         uls.reverse()
-        kstartup_send_data(titles, top_list_cnt, uls, INITIAL_CRAWLING)
+        print("crawling end")
+        kstartup_send_data(titles, uls, INITIAL_CRAWLING)
 
 
 def snventure_send_data(all_trs, flag):
@@ -1312,20 +1311,23 @@ def gtp():
 
 #send_to_marketing("크롤링 시작합니다잉?")
 
-#bizinfo()
-#kstratup()
-#snventure()
-#smtech()
-ripc()
-#egbiz()
-#nipa()
-#kocca()
-#kipa()
-#kdb()
-#gbsa()
-#gtp()
-#update_due_flag()
-#invis_past_biz()
+def main() :
+    bizinfo()
+    #kstartup()
+    snventure()
+    smtech()
+    ripc()
+    egbiz()
+    nipa()
+    kocca()
+    kipa()
+    kdb()
+    #gbsa()
+    gtp()
+    update_due_flag()
+    invis_past_biz()
+
+main()
+
 #send_to_marketing("크롤링 끝났슈 피곤하니까 밥이라도 사주쇼")
 
-#
